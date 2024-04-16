@@ -164,18 +164,17 @@ def solve_level_5(matches_str: str) -> str:
     lizard_count = int(inputs[4])
     totalcount = int(rock_count + paper_count + scissors_count + spock_count + lizard_count)
     rounds = int(math.log2(totalcount))
-    result = ""
     links = ""
     rechts = ""
 
-
+    """
     print("New call with totalcount: " + str(totalcount)
           + ", R: " + str(rock_count)
           + ", P: " + str(paper_count)
           + ", S: " + str(scissors_count)
           + ", Y: " + str(spock_count)
           + ", L: " + str(lizard_count))
-
+    """
 
     # Idee: wo viele gleiche wie möglich miteinander vernichten
     # Idee: Lizards und Papers bevorzugen, weil von Scissors besiegt
@@ -185,6 +184,7 @@ def solve_level_5(matches_str: str) -> str:
 
     # rekursion
     if rounds == 2:
+        #print("catch")
         return_value = ""
 
         for i in range(rock_count):
@@ -246,39 +246,84 @@ def solve_level_5(matches_str: str) -> str:
 
     # wenn hier hineingegangen wird, ist nicht in die erste Schleife gegangen worden -> counter_links ist noch 0
     else:
-        print("else")
-
-        print("R: " + str(rock_count)
-              + ", P: " + str(paper_count)
-              + ", S: " + str(scissors_count)
-              + ", Y: " + str(spock_count)
-              + ", L: " + str(lizard_count))
-
-        if spock_count > 0:
+        if rock_count > 0:
             links += "Y"
             spock_count -= 1
             counter_links += 1
 
-        while counter_links < length_links / 2:
-            if rock_count > 0:
-                links += "R"
-                rock_count -= 1
-                counter_links += 1
+            while counter_links < length_links / 2:
+                if rock_count > 0:
+                    links += "R"
+                    rock_count -= 1
+                    counter_links += 1
 
-            elif spock_count > 0:
-                links += "Y"
-                spock_count -= 1
-                counter_links += 1
+                elif spock_count > 0:
+                    links += "Y"
+                    spock_count -= 1
+                    counter_links += 1
 
-            elif scissors_count > 1:
-                links += "S"
-                scissors_count -= 1
-                counter_links += 1
+                elif scissors_count > 1:
+                    links += "S"
+                    scissors_count -= 1
+                    counter_links += 1
 
-            elif lizard_count > 0:
+                elif lizard_count > 0:
+                    links += "L"
+                    lizard_count -= 1
+                    counter_links += 1
+
+        else:
+            # keine rocks mehr -> möglichst schnell Y wegbringen
+
+            # print("else")
+            # print("R: " + str(rock_count)
+            #       + ", P: " + str(paper_count)
+            #       + ", S: " + str(scissors_count)
+            #       + ", Y: " + str(spock_count)
+            #       + ", L: " + str(lizard_count))
+
+            if spock_count > 0:
                 links += "L"
                 lizard_count -= 1
                 counter_links += 1
+
+                while counter_links < length_links:
+                    if spock_count > 0:
+                        links += "Y"
+                        spock_count -= 1
+                        counter_links += 1
+
+                    elif lizard_count > 0:
+                        links += "L"
+                        lizard_count -= 1
+                        counter_links += 1
+
+                    elif scissors_count > 0:
+                        links += "S"
+                        scissors_count -= 1
+                        counter_links += 1
+
+                    else:
+                        print("ehm wild joa")
+                        return -1
+
+            else:
+                while counter_links < length_links:
+                    if lizard_count > 0:
+                        links += "L"
+                        lizard_count -= 1
+                        counter_links += 1
+
+                    elif scissors_count > 0:
+                        links += "S"
+                        scissors_count -= 1
+                        counter_links += 1
+
+            #print("nach else")
+            #print(scissors_count)
+
+
+
 
         # jetzt ist evtl. bis zur hälfte alles aufgefüllt, ergebnis dieser hälfte wird spock sein -> andere hälfte muss lizard sein
         # es kann alles außer paper geben
@@ -290,103 +335,100 @@ def solve_level_5(matches_str: str) -> str:
 
         # Rest mit scissors/lizards auffüllen
 
-        print("R: " + str(rock_count)
-              + ", P: " + str(paper_count)
-              + ", S: " + str(scissors_count)
-              + ", Y: " + str(spock_count)
-              + ", L: " + str(lizard_count))
+        # print("R: " + str(rock_count)
+        #       + ", P: " + str(paper_count)
+        #       + ", S: " + str(scissors_count)
+        #       + ", Y: " + str(spock_count)
+        #       + ", L: " + str(lizard_count))
 
         to_go = length_links - counter_links
         i = 0
-        rounds_to_go = math.log2(to_go)
+        #print(to_go)
+        if to_go > 0:
 
-        while i < rounds_to_go:
-            if i == 0:
-                if lizard_count > 0:
-                    links += "L"
-                    lizard_count -= 1
-                    counter_links += 1
+            rounds_to_go = math.log2(to_go)
 
-                    if spock_count > 0:
-                        links += "Y"
-                        spock_count -= 1
-                        i += 1
-                        counter_links += 1
-                        continue
-
+            while i < rounds_to_go:
+                if i == 0:
                     if lizard_count > 0:
                         links += "L"
                         lizard_count -= 1
-                        i += 1
                         counter_links += 1
-                        continue
+
+                        if spock_count > 0:
+                            links += "Y"
+                            spock_count -= 1
+                            i += 1
+                            counter_links += 1
+                            continue
+
+                        if lizard_count > 0:
+                            links += "L"
+                            lizard_count -= 1
+                            i += 1
+                            counter_links += 1
+                            continue
 
 
-                    print("ach du dickes ei!")
-                    return -1
+                        print("ach du dickes ei!")
+                        return -1
 
-            length_for_this_iteration = 2 ** i
-            counter_in_loop = 0
+                length_for_this_iteration = 2 ** i
+                counter_in_loop = 0
 
-            if spock_count > 0:
-                links += "Y"
-                spock_count -= 1
-                counter_in_loop += 1
-                counter_links += 1
-
-            while counter_in_loop < length_for_this_iteration:
-                print(str(counter_in_loop) + " < " + str(length_for_this_iteration))
-                if rock_count > 0:
-                    links += "R"
-                    rock_count -= 1
-                    counter_in_loop += 1
-                    counter_links += 1
-
-                elif scissors_count > 1:
-                    links += "S"
-                    scissors_count -= 1
-                    counter_in_loop += 1
-                    counter_links += 1
-
-                elif spock_count > 0:
+                if spock_count > 0:
                     links += "Y"
                     spock_count -= 1
                     counter_in_loop += 1
                     counter_links += 1
 
-                elif lizard_count > 0:
-                    links += "L"
-                    lizard_count -= 1
-                    counter_in_loop += 1
-                    counter_links += 1
+                while counter_in_loop < length_for_this_iteration:
+                    #print(str(counter_in_loop) + " < " + str(length_for_this_iteration))
+                    if rock_count > 0:
+                        links += "R"
+                        rock_count -= 1
+                        counter_in_loop += 1
+                        counter_links += 1
+
+                    elif scissors_count > 1:
+                        links += "S"
+                        scissors_count -= 1
+                        counter_in_loop += 1
+                        counter_links += 1
+
+                    elif spock_count > 0:
+                        links += "Y"
+                        spock_count -= 1
+                        counter_in_loop += 1
+                        counter_links += 1
+
+                    elif lizard_count > 0:
+                        links += "L"
+                        lizard_count -= 1
+                        counter_in_loop += 1
+                        counter_links += 1
+
+                i += 1
 
 
 
 
-                #print("richtig beschissen")
-                #print("R: " + str(rock_count)
-                #      + ", P: " + str(paper_count)
-                #      + ", S: " + str(scissors_count)
-                #      + ", Y: " + str(spock_count)
-                #      + ", L: " + str(lizard_count))
-                #return -1
-
-            i += 1
-
-        print("R: " + str(rock_count)
-              + ", P: " + str(paper_count)
-              + ", S: " + str(scissors_count)
-              + ", Y: " + str(spock_count)
-              + ", L: " + str(lizard_count))
-
-
+    # print("pre rekursion")
+    # print("R: " + str(rock_count)
+    #       + ", P: " + str(paper_count)
+    #       + ", S: " + str(scissors_count)
+    #       + ", Y: " + str(spock_count)
+    #       + ", L: " + str(lizard_count))
 
     rechts = solve_level_5(create_match_string(rock_count, paper_count, scissors_count, spock_count, lizard_count))
+
+    #print("left:  " + links)
+    #print("right: " + rechts)
 
     return links + rechts
 
 
-def create_match_string(rock_count:str, paper_count:str, scissors_count:str, spock_count:str, lizard_count:str) -> str:
+def create_match_string(rock_count:int, paper_count:int, scissors_count:int, spock_count:int, lizard_count:int) -> str:
     matches_str_builder = ""
 
     matches_str_builder += str(rock_count)
@@ -431,19 +473,54 @@ if __name__ == '__main__':
         #print(solve_level_5(line))
         #print(play_full_tournament(solve_level_5(line)))
 
-
     for i in range(1, 6):
         lines = read_file(f"./level_5/level5_{i}.in")
         print(i)
 
         for line in lines:
             if play_full_tournament(solve_level_5(line)) != "S":
+                print("----------------------------------------------------------------------")
                 print(line)
-                print("-----------------")
                 print(solve_level_5(line))
-
+                print(play_full_tournament(solve_level_5(line)))
+                print("----------------------------------------------------------------------")
 
 
 
         winners = [solve_level_5(line) for line in lines]
         write_file(f"./level_5/level5_{i}.out", winners)
+
+
+    # 104R 2P 1S 15Y 6L
+    # 97R 2P 8S 12Y 9L
+
+    print("6R 5P 2S 3Y 0L")
+    print(solve_level_5("6R 5P 2S 3Y 0L"))
+    print("\n\n\n-------------------------------------------------------------------------------\n\n\n")
+    print(play_full_tournament(solve_level_5("6R 5P 2S 3Y 0L")))
+    print("\n\n\n===============================================================================\n\n\n")
+
+    print("7R 1P 1S 2Y 5L")
+    print(solve_level_5("7R 1P 1S 2Y 5L"))
+    print("\n\n\n-------------------------------------------------------------------------------\n\n\n")
+    print(play_full_tournament(solve_level_5("7R 1P 1S 2Y 5L")))
+    print("\n\n\n===============================================================================\n\n\n")
+
+    print("97R 2P 8S 12Y 9L")
+    print(solve_level_5("97R 2P 8S 12Y 9L"))
+    print("\n\n\n-------------------------------------------------------------------------------\n\n\n")
+    print(play_full_tournament(solve_level_5("97R 2P 8S 12Y 9L")))
+    print("\n\n\n===============================================================================\n\n\n")
+
+    print("0R 0P 4S 4Y 8L")
+    print(solve_level_5("0R 0P 4S 4Y 8L"))
+    print("\n\n\n-------------------------------------------------------------------------------\n\n\n")
+    print(play_full_tournament(solve_level_5("0R 0P 4S 4Y 8L")))
+
+    print("\n\n\n===============================================================================\n\n\n")
+
+    print("104R 2P 1S 15Y 6L")
+    print(solve_level_5("104R 2P 1S 15Y 6L"))
+    print("\n\n\n-------------------------------------------------------------------------------\n\n\n")
+    print(play_full_tournament(solve_level_5("104R 2P 1S 15Y 6L")))
+
